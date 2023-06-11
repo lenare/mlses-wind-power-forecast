@@ -1,0 +1,11 @@
+xarray==2023.5.0
+netCDF4==1.6.3
+packaging==23.1
+h5netcdf==1.1.0
+cftime==1.6.2
+
+pandas==2.0.2
+scikit-learn==1.2.2
+matplotlib==3.7.1
+# tensorflow==2.12.0 # for x64
+tensorflow-macos==2.12.0 # for arm chips
