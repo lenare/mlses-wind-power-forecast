@@ -98,3 +98,6 @@ dmypy.json
 
 ### MacOS ###
 *.DS_Store
+
+### Custom ###
+misc

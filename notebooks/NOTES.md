@@ -23,3 +23,12 @@ Things to consider:
 9. Turbine Characteristics: Some turbine-specific variables can provide additional information for better predictions. These may include turbine capacity, rotor diameter, hub height, or other technical specifications.
 
 etc.
+
+## Next steps
+
+- plot time series to see if there are patterns you can exploit
+- Look at correlations (e.g. Pearson correlation) between variables in data set
+
+## Notes
+
+- Density adjusted wind speed is equal to or correlates with wind speed or other wind speed measurements?
