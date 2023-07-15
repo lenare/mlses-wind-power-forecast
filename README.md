@@ -32,6 +32,8 @@ For evaluation, please mainly consider the source code from the [src folder](./s
 
 ## Setup
 
+0. Download necessary data for [UK](https://zenodo.org/record/5841834#.ZEajKXbP2BQ) and [Brazil](https://zenodo.org/record/1475197#.ZD6iMxXP2WC) wind farm.
+
 1. Clone this repository and change into the mlses-wind-power-forecast directory
 ```
 git clone https://github.com/lenare/mlses-wind-power-forecast.git
