@@ -1,6 +1,8 @@
 # mlses-wind-power-forecast
 Wind power forecast project for the "Machine Learning for renewable energy systems" (MLSES) seminar in the summer term 2023 at the University of Tübingen.
 
+**NOTE:** For evaluation, please mainly consider the source code from the [src folder](./src/) as the [notebooks folder](./notebooks/) is meant for exploration and prototyping.
+
 ## Description
 
 The goal of the mlses-wind-power-forecast project is to implement a Machine Learning method to forecast the power output of a wind turbine of at least one turbine for each of the two considered wind farms, one in Kelmarsh, UK and one in Brazil. Three different time horizons are to be considered for the forecast: next step (10 minutes), next hour and next day.
@@ -26,9 +28,8 @@ The structure of the project is the following:
     - **data**: data related code, e.g. loading/saving data, general preprocessing, etc.
     - **models**: model related code, e.g. for UK XGBoost and Brazil XGBoost regression models
     - **utils**: util code, e.g. configuration parameters and logging
-    - main.py: main source code
+    - main.ipynb: main source code as notebook
 
-For evaluation, please mainly consider the source code from the [src folder](./src/) as the [notebooks folder](./notebooks/) is meant for exploration and prototyping.
 
 ## Setup
 
