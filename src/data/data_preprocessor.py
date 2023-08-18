@@ -13,6 +13,7 @@ class DataPreprocessor():
     valid_ratio: float
     test_ratio: float
     model_type: str
+    target_variable: str
 
     def __init__(self, train_ratio: float = 0.8, valid_ratio: float = 0, test_ratio: float = 0.2, model_type: str = "XGBOOST"):
         ''' Init with train/val/test ratio '''
@@ -40,13 +41,22 @@ class DataPreprocessor():
     #     df = df['06-01-2016':]
     #     return df.fillna(method='ffill')
 
-    def shift_target_variable(self, df: pd.DataFrame, target_variable: str) -> pd.DataFrame:
+    def shift_target_variable(
+        self,
+        df: pd.DataFrame,
+        next_step_delay: int = -1,
+        next_hour_delay: int = -6,
+        next_day_delay: int = -6*24
+    ) -> pd.DataFrame:
         ''' Shift data for different time horizons '''
         shifted_df = df.copy()
         # Shift the target variable for different horizons
-        shifted_df['power_next_step'] = df[target_variable].shift(-1)
-        shifted_df['power_next_hour'] = df[target_variable].shift(-6)
-        shifted_df['power_next_day'] = df[target_variable].shift(-6*24)
+        shifted_df['power_next_step'] = df[self.target_variable].shift(
+            next_step_delay)
+        shifted_df['power_next_hour'] = df[self.target_variable].shift(
+            next_hour_delay)
+        shifted_df['power_next_day'] = df[self.target_variable].shift(
+            next_day_delay)
         # Drop rows with NaN values in the shifted columns
         shifted_df.dropna(
             subset=['power_next_step', 'power_next_hour', 'power_next_day'], inplace=True)
@@ -56,8 +66,6 @@ class DataPreprocessor():
         ''' Split data into train, (valid) and test set '''
         timestamp_delta = df.index[-1] - df.index[0]
         timestamp_step_delta = df.index[1] - df.index[0]
-        print(f"timestamp_delta: {timestamp_delta}")
-        print(f"timestamp_step_delta: {timestamp_step_delta}")
 
         # Train set
         start_train = df.index[0]
@@ -66,15 +74,12 @@ class DataPreprocessor():
 
         # Validation set
         end_valid = end_train + timestamp_delta * self.valid_ratio
-        valid = df[end_train.ceil(timestamp_step_delta)                   :end_valid.floor(timestamp_step_delta)]
+        valid = df[end_train.ceil(timestamp_step_delta)
+                                  :end_valid.floor(timestamp_step_delta)]
 
         # Test set
         end_test = end_valid + timestamp_delta * self.test_ratio
         test = df[end_valid.ceil(timestamp_step_delta):df.index[-1]]
-
-        print(f"train range: {start_train}/{end_train.floor(timestamp_step_delta)}" +
-              f"\nvalid range: {end_train.ceil(timestamp_step_delta)}/{end_valid.floor(timestamp_step_delta)}" +
-              f"\ntest range: {end_valid.ceil(timestamp_step_delta)}/{end_test.ceil(timestamp_step_delta)}")
 
         # Raise exception if last timestamp of df is not equal to last timestamp of test set
         if df.index[-1] != end_test.ceil(timestamp_step_delta):
@@ -92,7 +97,7 @@ class DataPreprocessor():
 
     def plot_data_split(self, train_data: pd.DataFrame(), val_data: pd.DataFrame(), test_data: pd.DataFrame()) -> None:
         ''' Plot the data split into training, validation and testing '''
-        figure, ax = plt.subplots(figsize=(20, 5))
+        _, ax = plt.subplots(figsize=(20, 5))
         train_data.resample('D').mean().plot(
             ax=ax, label="Training", y="power_next_step")
         val_data.resample('D').mean().plot(
@@ -101,8 +106,11 @@ class DataPreprocessor():
             ax=ax, label="Testing",  y="power_next_step", title="Power")
         plt.show()
 
-    def create_rolling_window_statistics(self, df: pd.DataFrame, column: str) -> pd.DataFrame:
+    def create_rolling_window_statistics(self, df: pd.DataFrame, column: str = None) -> pd.DataFrame:
         ''' Create rolling window statistics for features '''
+        if column == None:
+            # default column is target variable
+            column = self.target_variable
         df['power_1h_mean'] = df[column].rolling(window=6).mean()
         df['power_12h_mean'] = df[column].rolling(window=6*12).mean()
         df['power_24h_mean'] = df[column].rolling(window=6*24).mean()
@@ -140,18 +148,25 @@ class DataPreprocessor():
         df = encode(df, 'season', 4)
         df = encode(df, 'day', 31)
         return df
-    
+
     def get_features_labels(self, df: pd.DataFrame, target_variable: str) -> Tuple[list, str, str, str]:
-        ''' Split dataframe into features and labels '''
-        # TODO: improve
+        ''' Get features and label columns to split dataframe into features and labels '''
+        # TODO: improve (e.g. loop over removal list to rm duplicate code)
         features = list(df.columns)
-        features.remove(target_variable) if target_variable in features else None
-        features.remove(target_variable + "_min") if target_variable + "_min" in features else None
-        features.remove(target_variable + "_max") if target_variable + "_max" in features else None
-        features.remove('power_next_step') if 'power_next_step' in features else None
-        features.remove('power_next_hour') if 'power_next_hour' in features else None
-        features.remove('power_next_day') if 'power_next_day' in features else None
-        features.extend(["season", "month", "hour", "quarter", "year", "power_1h_mean", "power_12h_mean", "power_24h_mean", "power_1h_std", "power_12h_std", "power_24h_std", "power_1h_max", "power_12h_max", "power_24h_max", "power_1h_min", "power_12h_min", "power_24h_min"])
+        features.remove(
+            target_variable) if target_variable in features else None
+        features.remove(target_variable + "_min") if target_variable + \
+            "_min" in features else None
+        features.remove(target_variable + "_max") if target_variable + \
+            "_max" in features else None
+        features.remove(
+            'power_next_step') if 'power_next_step' in features else None
+        features.remove(
+            'power_next_hour') if 'power_next_hour' in features else None
+        features.remove(
+            'power_next_day') if 'power_next_day' in features else None
+        features.extend(["season", "month", "hour", "quarter", "year", "power_1h_mean", "power_12h_mean", "power_24h_mean", "power_1h_std",
+                        "power_12h_std", "power_24h_std", "power_1h_max", "power_12h_max", "power_24h_max", "power_1h_min", "power_12h_min", "power_24h_min"])
         features = list(set(features))
 
         target_next_step = 'power_next_step'
@@ -159,11 +174,20 @@ class DataPreprocessor():
         target_next_day = 'power_next_day'
 
         return features, target_next_step, target_next_hour, target_next_day
+    
+    def split_features_labels(self, data: pd.DataFrame()) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        ''' Split features and labels '''
+        # Prepare the training and test data for different horizons
+        features, target_next_step, target_next_hour, target_next_day = self.get_features_labels(data, self.target_variable)
+        X_data, y_next_step, y_next_hour, y_next_day = data[features], data[
+            target_next_step], data[target_next_hour], data[target_next_day]
+        return X_data, y_next_step, y_next_hour, y_next_day
 
 
 class UKDataPreprocessor(DataPreprocessor):
     ''' Data preprocessor for UK data '''
     data_type: str = "UK"
+    target_variable: str = config.UK_TARGET_VARIABLE
 
     def select_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         ''' Select which columns of dataframe columns to keep'''
@@ -183,20 +207,22 @@ class UKDataPreprocessor(DataPreprocessor):
         df = df.sort_index()
         return df
 
-    def preprocess_data(self, df: pd.DataFrame) -> pd.DataFrame():
-        ''' Preprocess data combining several steps defined in this class '''
+    def clean_data(self, df: pd.DataFrame) -> pd.DataFrame():
+        ''' Cleaning data combining several steps defined in this class '''
         # Rename columns, set timestamp as index
         renamed_df = self.rename_columns(df)
         reindexed_df = self.set_timestamp_index(
             renamed_df, '#_date_and_time')
-        preprocessed_data = self.select_columns(reindexed_df)
+        cleaned_data = self.select_columns(reindexed_df)
 
-        return preprocessed_data
+        return cleaned_data
 
 
 class BrazilDataPreprocessor(DataPreprocessor):
     ''' Data preprocessor for Brazil data '''
-    data_type: str = "Brazil"
+    data_type: str = "BRAZIL"
+    turbine_number: int = config.BRAZIL_TURBINE_NUMBER
+    target_variable: str = config.BRAZIL_TARGET_VARIABLE
 
     def select_turbine(self, ds: Dataset, turbine_number: int) -> pd.DataFrame():
         ''' Select which turbine to keep'''
@@ -204,7 +230,7 @@ class BrazilDataPreprocessor(DataPreprocessor):
             raise ValueError(
                 f"Turbine {turbine_number} not in dataset! Please choose one of {ds.Turbine.values.tolist()}")
         else:
-            df = ds.sel(Turbine=2).to_dataframe()
+            df = ds.sel(Turbine=turbine_number).to_dataframe()
             # drop column Turbine
             df = df.drop(columns=["Turbine"])
 
@@ -225,9 +251,9 @@ class BrazilDataPreprocessor(DataPreprocessor):
     def select_columns(self, df: pd.DataFrame) -> pd.DataFrame():
         ''' Select which columns of dataframe columns to keep'''
         # TODO: improve which columns to drop
-        if len(config.UK_COLUMNS) > 0:
+        if len(config.BRAZIL_COLUMNS) > 0:
             # only use columns specified in config
-            selected_df = df[config.UK_COLUMNS]
+            selected_df = df[config.BRAZIL_COLUMNS]
         else:
             # columns with less than specified percentage missing values
             is_missing = df.isna().sum()/len(df)
@@ -241,14 +267,13 @@ class BrazilDataPreprocessor(DataPreprocessor):
 
         return selected_df
 
-    def preprocess_data(self, ds: Dataset, turbine_number: int) -> pd.DataFrame():
-        ''' Preprocess data combining several steps defined in this class '''
-        # Select turbine, rename columns to snake case, set timestamp as index, select columns
-        selected_turbine_df = self.select_turbine(ds, turbine_number)
+    def clean_data(self, ds: Dataset) -> pd.DataFrame():
+        ''' Clean data combining several steps defined in this class '''
+        # Select turbine, rename columns to snake case, set timestamp as index, [select columns]
+        selected_turbine_df = self.select_turbine(ds, self.turbine_number)
         grouped_df = self.handle_height_coordinate(selected_turbine_df)
         renamed_df = self.rename_columns(grouped_df)
-        preprocessed_data = self.rename_index(renamed_df)
+        cleaned_data = self.rename_index(renamed_df)
         # selected_df = self.select_columns(reindexed_df)
 
-        return preprocessed_data
-
+        return cleaned_data

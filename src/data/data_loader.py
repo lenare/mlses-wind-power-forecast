@@ -11,6 +11,9 @@ class DataLoader:
                 raise ValueError("List of file paths is empty!")
             if file_path[0].endswith(".csv"):
                 return pd.concat([pd.read_csv(file_path, **kwargs) for file_path in file_path])
+            else:
+                raise ValueError(
+                    f"File extension for multiple not supported! Please use .csv files.")
         else:
             if file_path.endswith(".csv"):
                 return pd.read_csv(file_path, **kwargs)
@@ -18,7 +21,7 @@ class DataLoader:
                 return xr.open_dataset(file_path)
             else:
                 raise ValueError(
-                    f"File extension not supported! Please use .csv or .nc files.")
+                    f"File extension not supported! Please use .csv or .nc file.")
 
     def save_data(self, df: pd.DataFrame(), csv_file_path: str, **kwargs) -> str:
         # Code for saving csv data to file_path

@@ -59,10 +59,6 @@ Several plot and evaluation md files should be created where you can see the res
 
 NOTE: You may still need to install [graphviz](https://www.graphviz.org/) if it isn't already installed on your system!
 
-## TODOs
-- Add more documentation! (especially results and evaluation, also provide explanation for why Brazil model performs better)
-- Improve feature selection!
-- Maybe try another model (LSTM)
 
 ## Results
 With the XGBoost model the benchmark for all horizons for the [UK wind farm](./src/XGBOOST_uk_evaluation.md) is outperformed slightly. The XGBoost model performs even better for the [Brazil wind farm](./src/XGBOOST_brazil_evaluation.md), especially also on the longer horizons. 
@@ -70,6 +66,7 @@ With the XGBoost model the benchmark for all horizons for the [UK wind farm](./s
 
 ## Further improvements
 There are several possibilities that can be evaluated to further improve the wind power forecast. These include:
-- testing different models
+- improve feature selection
+- testing different models (e.g. LSTMs)
 - consider additional data (e.g. wind data)
 - adapt feature selection/engineering further (e.g. try different rolling window statistics)
