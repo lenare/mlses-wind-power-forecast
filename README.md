@@ -7,28 +7,16 @@ Wind power forecast project for the "Machine Learning for renewable energy syste
 
 The goal of the mlses-wind-power-forecast project is to implement a Machine Learning method to forecast the power output of a wind turbine of at least one turbine for each of the two considered wind farms, one in Kelmarsh, UK and one in Brazil. Three different time horizons are to be considered for the forecast: next step (10 minutes), next hour and next day.
 
-For this, after downloading the necessary data the following steps are performed:
-1. [All available data for one UK turbine and one Brazil turbine is loaded.](./src/main.py#L17)
-2. [Both dataframes are preprocessed](./src/main.py#L26) according to what is defined in the respective data preprocessor classes for [UK](./src/data/data_preprocessor.py#L164) and [Brazil](./src/data/data_preprocessor.py#L197).
-3. [Feature engineering is performed](./src/main.py#L37) where new features are created (e.g. rolling window statistics, lag features, etc.).
-4. [Dataframes are split for training, validating and testing the models.](./src/main.py#L56)
-5. [The feature and label column names for each dataframe are identified.](./src/main.py#L75)
-6. [Dataframes are split into feature and label columns.](./src/main.py#L86)
-7. [All 6 models (three for each UK and Brazil) are trained and validated.](./src/main.py#L102)
-8. [Predictions for all horizons are made.](./src/main.py#L109)
-9. [Models and predictions are evaluated.](./src/main.py#L116)
-10. [Plots and models are saved.](./src/main.py#L123)
-
 ### Structure
 The structure of the project is the following:
 - **data**: contains raw, preprocessed data for the two datasets UK and Brazil as well as trained models
 - **docs**: additional documentation
 - **notebooks**: jupyter notebooks for explorative data analysis and ML prototyping and experimenting
 - **src**: main source code
-    - **data**: data related code, e.g. loading/saving data, general preprocessing, etc.
-    - **models**: model related code, e.g. for UK XGBoost and Brazil XGBoost regression models
-    - **utils**: util code, e.g. configuration parameters and logging
-    - main.ipynb: main source code as notebook
+    - [**data**](./src/data): data related code, e.g. loading/saving data, general preprocessing, etc.
+    - [**models**](./src/models/): model related code, e.g. for UK XGBoost and Brazil XGBoost regression models
+    - [**utils**](./src/utils/): util code, e.g. configuration parameters and logging
+    - [**main.ipynb**](./src/main.ipynb): main source code as notebook
 
 
 ## Setup
@@ -58,11 +46,11 @@ python main.py
 ```
 Several plot and evaluation md files should be created where you can see the results.
 
-NOTE: You may still need to install [graphviz](https://www.graphviz.org/) if it isn't already installed on your system!
+NOTE: You may still need to install [graphviz](https://www.graphviz.org/) for generating some plots if it isn't already installed on your system!
 
 
 ## Results
-With the XGBoost model the benchmark for all horizons for the [UK wind farm](./src/XGBOOST_uk_evaluation.md) is outperformed slightly. The XGBoost model performs even better for the [Brazil wind farm](./src/XGBOOST_brazil_evaluation.md), especially also on the longer horizons. 
+Based on the evalutaion metrics MAE and RMSE the presented XGBoost model slightly outperforms the benchmark for all horizons for the UK wind farm. For the Brazil wind farm the benchmark performs a bit better. Below are some suggested improvements to enhance our implementation.
 
 
 ## Further improvements
