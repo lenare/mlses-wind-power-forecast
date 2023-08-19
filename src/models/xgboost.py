@@ -87,14 +87,14 @@ class XGBoost():
         benchmark_df = pd.read_csv('../benchmark_wind.csv', index_col=3)
         benchmark_df = benchmark_df[(benchmark_df.data_type == self.data_type)]
         eval_df = pd.DataFrame(
-                    {
-                        'MAE': [self.mae_next_step, self.mae_next_hour, self.mae_next_day],
-                        'benchmark_MAE': benchmark_df.MAE.values,
-                        'RMSE': [self.rmse_next_step, self.rmse_next_hour, self.rmse_next_day],
-                        'benchmark_RMSE': benchmark_df.RMSE.values,
-                    },
-                    index=['next_step', 'next_hour', 'next_day'],
-                )
+            {
+                'MAE': [self.mae_next_step, self.mae_next_hour, self.mae_next_day],
+                'benchmark_MAE': benchmark_df.MAE.values,
+                'RMSE': [self.rmse_next_step, self.rmse_next_hour, self.rmse_next_day],
+                'benchmark_RMSE': benchmark_df.RMSE.values,
+            },
+            index=['next_step', 'next_hour', 'next_day'],
+        )
         return eval_df
 
     def save_prediction_plot(self, y_test: pd.DataFrame(), y_pred: pd.DataFrame(), name: str, dir_path: str = './plots') -> str:

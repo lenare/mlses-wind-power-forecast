@@ -74,8 +74,7 @@ class DataPreprocessor():
 
         # Validation set
         end_valid = end_train + timestamp_delta * self.valid_ratio
-        valid = df[end_train.ceil(timestamp_step_delta)
-                                  :end_valid.floor(timestamp_step_delta)]
+        valid = df[end_train.ceil(timestamp_step_delta):end_valid.floor(timestamp_step_delta)]
 
         # Test set
         end_test = end_valid + timestamp_delta * self.test_ratio
@@ -174,11 +173,12 @@ class DataPreprocessor():
         target_next_day = 'power_next_day'
 
         return features, target_next_step, target_next_hour, target_next_day
-    
+
     def split_features_labels(self, data: pd.DataFrame()) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         ''' Split features and labels '''
         # Prepare the training and test data for different horizons
-        features, target_next_step, target_next_hour, target_next_day = self.get_features_labels(data, self.target_variable)
+        features, target_next_step, target_next_hour, target_next_day = self.get_features_labels(
+            data, self.target_variable)
         X_data, y_next_step, y_next_hour, y_next_day = data[features], data[
             target_next_step], data[target_next_hour], data[target_next_day]
         return X_data, y_next_step, y_next_hour, y_next_day
