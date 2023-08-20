@@ -21,15 +21,15 @@ The structure of the project is the following:
 
 ## Setup
 
-0. Download necessary data for [UK](https://zenodo.org/record/5841834#.ZEajKXbP2BQ) and [Brazil](https://zenodo.org/record/1475197#.ZD6iMxXP2WC) wind farm.
+1. Download necessary data for [UK](https://zenodo.org/record/5841834#.ZEajKXbP2BQ) and [Brazil](https://zenodo.org/record/1475197#.ZD6iMxXP2WC) wind farm.
 
-1. Clone this repository and change into the mlses-wind-power-forecast directory
+2. Clone this repository and change into the mlses-wind-power-forecast directory
 ```
 git clone https://github.com/lenare/mlses-wind-power-forecast.git
 cd mlses-wind-power-forecast
 ```
 
-2. Create a python virtual environment and activate it
+3. Create a python virtual environment and activate it
 ```
 python3 -m venv venv
 . ./venv/bin/activate
@@ -39,14 +39,14 @@ and install the necessary libraries via pip.
 pip install -r requirements.txt
 ```
 
-3. Then change in the src directory and run the main script
+4. Then change in the src directory and run the main script
 ```
 cd src
 python main.py
 ```
 Several plot and evaluation md files should be created where you can see the results.
 
-NOTE: You may still need to install [graphviz](https://www.graphviz.org/) for generating some plots if it isn't already installed on your system!
+**NOTE**: You may still need to install [graphviz](https://www.graphviz.org/) for generating some plots if it isn't already installed on your system!
 
 
 ## Results
